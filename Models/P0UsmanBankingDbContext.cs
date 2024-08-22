@@ -24,8 +24,8 @@ public partial class P0UsmanBankingDbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("server=DESKTOP-C0M19OK\\COLUMBUSSERVER;Database=P0_usman_bankingDB;Integrated Security=True;TrustServerCertificate=True;");
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-C0M19OK\\COLUMBUSSERVER;Database=P0_usman_bankingDB;Trusted_Connection=True;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,10 +39,6 @@ public partial class P0UsmanBankingDbContext : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("acc_no");
             entity.Property(e => e.AccBalance).HasColumnName("acc_balance");
-            entity.Property(e => e.AccCustomer)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasColumnName("acc_customer");
             entity.Property(e => e.AccIsActive).HasColumnName("acc_is_active");
             entity.Property(e => e.AccName)
                 .HasMaxLength(20)
@@ -52,10 +48,14 @@ public partial class P0UsmanBankingDbContext : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .HasColumnName("acc_type");
+            entity.Property(e => e.AccUsername)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("acc_username");
 
-            entity.HasOne(d => d.AccCustomerNavigation).WithMany(p => p.AccountInfos)
-                .HasForeignKey(d => d.AccCustomer)
-                .HasConstraintName("FK_acc_customer");
+            entity.HasOne(d => d.AccUsernameNavigation).WithMany(p => p.AccountInfos)
+                .HasForeignKey(d => d.AccUsername)
+                .HasConstraintName("FK_acc_username");
         });
 
         modelBuilder.Entity<NewServiceRequest>(entity =>
@@ -66,10 +66,18 @@ public partial class P0UsmanBankingDbContext : DbContext
 
             entity.Property(e => e.RequestId).HasColumnName("request_id");
             entity.Property(e => e.AccNo).HasColumnName("acc_no");
-            entity.Property(e => e.RequestDescription)
-                .HasMaxLength(200)
+            entity.Property(e => e.RequestDate)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("request_date");
+            entity.Property(e => e.RequestStatus)
+                .HasMaxLength(30)
                 .IsUnicode(false)
-                .HasColumnName("request_description");
+                .HasColumnName("request_status");
+            entity.Property(e => e.ServiceType)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("service_type");
 
             entity.HasOne(d => d.AccNoNavigation).WithMany(p => p.NewServiceRequests)
                 .HasForeignKey(d => d.AccNo)
@@ -78,7 +86,7 @@ public partial class P0UsmanBankingDbContext : DbContext
 
         modelBuilder.Entity<Transaction>(entity =>
         {
-            entity.HasKey(e => e.TransactionId).HasName("PK__transact__85C600AFAD9E8E29");
+            entity.HasKey(e => e.TransactionId).HasName("PK_transaction_id");
 
             entity.ToTable("transactions");
 

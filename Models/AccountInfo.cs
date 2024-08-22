@@ -15,9 +15,9 @@ public partial class AccountInfo
 
     public bool? AccIsActive { get; set; }
 
-    public string? AccCustomer { get; set; }
+    public string? AccUsername { get; set; }
 
-    public virtual User? AccCustomerNavigation { get; set; }
+    public virtual User? AccUsernameNavigation { get; set; }
 
     public virtual ICollection<NewServiceRequest> NewServiceRequests { get; set; } = new List<NewServiceRequest>();
 

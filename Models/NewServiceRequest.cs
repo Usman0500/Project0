@@ -9,7 +9,11 @@ public partial class NewServiceRequest
 
     public int? AccNo { get; set; }
 
-    public string? RequestDescription { get; set; }
+    public string ServiceType { get; set; } = null!;
+
+    public string RequestStatus { get; set; } = null!;
+
+    public DateTime? RequestDate { get; set; }
 
     public virtual AccountInfo? AccNoNavigation { get; set; }
 }
