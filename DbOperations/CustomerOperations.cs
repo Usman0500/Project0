@@ -5,17 +5,22 @@ using System.Data.SqlClient;
 using System.Linq;
 public class CustomerOperations
 {
+    //Database context for interacting with the database
     P0UsmanBankingDbContext db = new P0UsmanBankingDbContext();
+    //Method to check if the customer's login credentials are correct
     public bool CheckCustomerLogin(string? username, string? password)
     {
+        //Query to find the customer with the given username and role "Customer"
         var checkCustomer = (from a in db.Users
                              where a.Username == username && a.Password == password && a.UserRole == "Customer"
-                             select a).SingleOrDefault(); //using Single() returns an Exception
+                             select a).SingleOrDefault(); //Using Single() returns an Exception if there's no results
 
+        //If true, return checkCustomer
         return checkCustomer != null;
 
     }
-
+    
+    //Method to display the customer menu options
     public void ShowCustomerMenu()
     {
         Console.Clear();
@@ -31,14 +36,16 @@ public class CustomerOperations
         Console.WriteLine("9. Exit");
     }
 
+    //Method to get the details of a specific account by its number
     public AccountInfo? GetAccountDetails(int accNo)
     {
-        return db.AccountInfos.Find(accNo);    
+        return db.AccountInfos.Find(accNo); //Find returns null if no account is found   
     }
 
-
+    //Method to request a check book for a specific account
     public void RequestCheckBook(int accNo)
     {
+        //Create a new service request for a check book
         var account = db.AccountInfos.Find(accNo);
         if (account != null)
         {
@@ -49,7 +56,7 @@ public class CustomerOperations
                 RequestStatus = "Pending",
                 RequestDate = DateTime.Now
             });
-            db.SaveChanges();
+            db.SaveChanges(); //Save changes to the database
             Console.WriteLine("Check book requested.");
         }
         else
@@ -58,11 +65,12 @@ public class CustomerOperations
         }
     }
 
+    //Method to create a new account type for the customer
     public void CreateNewAccountType(string? username, string? accType)
     {
         try
         {
-            var user = db.Users.Find(username);
+            var user = db.Users.Find(username);  //Find the user by username
             if (user != null)
             {
                 AccountInfo newAcc = new AccountInfo();
@@ -76,11 +84,11 @@ public class CustomerOperations
                 Console.WriteLine("Enter Initial Deposit:");
                 newAcc.AccBalance = Convert.ToDouble(Console.ReadLine());
 
-                newAcc.AccIsActive = true;
-                newAcc.AccUsername = username;
+                newAcc.AccIsActive = true; //Set account status to active
+                newAcc.AccUsername = username; //Set the username for the account
 
-                db.AccountInfos.Add(newAcc);
-                db.SaveChanges();
+                db.AccountInfos.Add(newAcc); //Add the new account to the database
+                db.SaveChanges(); //Save changes to the database
 
                 Console.WriteLine($"{accType} account created successfully");
             }
@@ -122,6 +130,7 @@ public class CustomerOperations
                 }
                 else
                 {
+                    //Handle incorrect temporary password
                     Console.WriteLine("The temporary password is incorrect.");
                     Console.WriteLine("Would you like to request a new password?");
                     string response = (Console.ReadLine() ?? string.Empty).ToLower();
@@ -140,7 +149,7 @@ public class CustomerOperations
                     }
                     else if (response == "no")
                     {
-                        return;
+                        return; //Exit the method if the user does not want to request a new password
                     }
                     else
                     {
